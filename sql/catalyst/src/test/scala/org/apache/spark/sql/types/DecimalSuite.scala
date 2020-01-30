@@ -64,6 +64,7 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester with SQLHelper
     intercept[ArithmeticException](Decimal(BigDecimal("10.030"), 2, 1))
     intercept[ArithmeticException](Decimal(BigDecimal("-9.95"), 2, 1))
     intercept[ArithmeticException](Decimal(1e17.toLong, 17, 0))
+    intercept[ArithmeticException](Decimal(BigDecimal("100000000000000000000000000000000000000")))
   }
 
   test("creating decimals with negative scale under legacy mode") {
@@ -154,7 +155,7 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester with SQLHelper
     assert(Decimal(Long.MaxValue).hashCode() === Long.MaxValue.##)
     assert(Decimal(BigDecimal(123)).hashCode() === (123).##)
 
-    val reallyBig = BigDecimal("123182312312313232112312312123.1231231231")
+    val reallyBig = BigDecimal("123182312312313232112312312123.12312312")
     assert(Decimal(reallyBig).hashCode() === reallyBig.hashCode)
   }
 
@@ -248,7 +249,7 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester with SQLHelper
 
   test("SPARK-26038: toScalaBigInt/toJavaBigInteger") {
     // not fitting long
-    val decimal = Decimal("1234568790123456789012348790.1234879012345678901234568790")
+    val decimal = Decimal("1234568790123456789012348790.1234567890")
     assert(decimal.toScalaBigInt == scala.math.BigInt("1234568790123456789012348790"))
     assert(decimal.toJavaBigInteger == new java.math.BigInteger("1234568790123456789012348790"))
     // fitting long

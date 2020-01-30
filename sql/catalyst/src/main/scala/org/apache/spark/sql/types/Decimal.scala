@@ -115,6 +115,12 @@ final class Decimal extends Ordered[Decimal] with Serializable {
    * Set this Decimal to the given BigDecimal value, with a given precision and scale.
    */
   def set(decimal: BigDecimal, precision: Int, scale: Int): Decimal = {
+    // Avoid higher precision sizes than MAX_PRECISION
+    if (decimal.precision > DecimalType.MAX_PRECISION) {
+      throw new ArithmeticException(
+        s"${DecimalType.simpleString} can only support precision up to ${DecimalType.MAX_PRECISION}")
+    }
+
     DecimalType.checkNegativeScale(scale)
     this.decimalVal = decimal.setScale(scale, ROUND_HALF_UP)
     if (decimalVal.precision > precision) {
@@ -131,6 +137,12 @@ final class Decimal extends Ordered[Decimal] with Serializable {
    * Set this Decimal to the given BigDecimal value, inheriting its precision and scale.
    */
   def set(decimal: BigDecimal): Decimal = {
+    // Avoid higher precision sizes than MAX_PRECISION
+    if (decimal.precision > DecimalType.MAX_PRECISION) {
+      throw new ArithmeticException(
+        s"${DecimalType.simpleString} can only support precision up to ${DecimalType.MAX_PRECISION}")
+    }
+
     this.decimalVal = decimal
     this.longVal = 0L
     if (decimal.precision < decimal.scale) {
